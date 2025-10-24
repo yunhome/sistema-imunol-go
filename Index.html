@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz: Defesa do Corpo — Sistema Imunológico</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#0f1724;
+      --accent:#6ee7b7;
+      --accent-2:#60a5fa;
+      --muted:#94a3b8;
+      --danger:#fb7185;
+      --glass: rgba(255,255,255,0.04);
+      --glass-2: rgba(255,255,255,0.02);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(800px 400px at 10% 10%, rgba(96,165,250,0.06), transparent 8%),
+        radial-gradient(700px 300px at 95% 90%, rgba(110,231,183,0.03), transparent 8%),
+        var(--bg);
+      color: #e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:24px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:20px;
+      flex-direction:column;
+      min-height:100vh;
+    }
+
+    .container{
+      width:100%;
+      max-width:920px;
+    }
+
+    header{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      margin-bottom:18px;
+    }
+    .logo{
+      width:72px;height:72px;border-radius:14px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:flex;align-items:center;justify-content:center;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      flex-shrink:0;
+    }
+    .logo svg{width:44px;height:44px;filter:drop-shadow(0 6px 18px rgba(2,6,23,0.6));}
+    header h1{font-size:20px;margin:0}
+    header p{margin:0;color:var(--muted);font-size:13px}
+
+    .card{
+      background:linear-gradient(180deg,var(--card), rgba(255,255,255,0.01));
+      border-radius:14px;
+      padding:20px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      overflow:hidden;
+    }
+
+    .quiz{
+      display:grid;
+      grid-template-columns: 1fr 320px;
+      gap:18px;
+    }
+    @media (max-width:900px){ .quiz{grid-template-columns:1fr} }
+
+    .main{
+      padding:12px;
+      border-radius:10px;
+      background:linear-gradient(180deg,var(--glass),transparent);
+      min-height:360px;
+    }
+
+    .meta{
+      display:flex;gap:12px;align-items:center;margin-bottom:12px;
+    }
+    .progress{
+      height:12px;background:var(--glass-2);border-radius:999px;flex:1;overflow:hidden;
+    }
+    .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%;transition:width .5s ease}
+
+    .qtitle{font-weight:600;margin:6px 0 12px}
+    .question-text{font-size:16px;color:#d7e9ff;margin-bottom:12px;line-height:1.4}
+    .choices{display:flex;flex-direction:column;gap:8px}
+    .choice{
+      padding:12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);cursor:pointer;
+      transition: transform .08s ease, background .12s;
+      display:flex;align-items:center;gap:12px;
+    }
+    .choice:hover{transform:translateY(-3px)}
+    .choice .dot{width:36px;height:36px;border-radius:999px;background:var(--glass);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent-2)}
+    .choice.correct{border:1px solid rgba(110,231,183,0.22);background:linear-gradient(90deg, rgba(110,231,183,0.03), transparent)}
+    .choice.wrong{border:1px solid rgba(251,113,133,0.18);background:linear-gradient(90deg, rgba(251,113,133,0.03), transparent)}
+    .choice.disabled{opacity:.6;cursor:default;transform:none}
+
+    .explain{margin-top:12px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted);font-size:14px}
+
+    .side{
+      padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      display:flex;flex-direction:column;gap:12px;height:100%;
+    }
+    .stat{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;background:var(--glass)}
+    .stat small{color:var(--muted);display:block;font-size:12px}
+    .btns{display:flex;gap:8px;flex-wrap:wrap}
+    button{
+      border:0;padding:10px 12px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:#022;cursor:pointer;font-weight:600;
+    }
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);font-weight:600}
+    .badge{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);font-weight:700;color:var(--accent-2)}
+
+    footer{margin-top:14px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
+
+    /* small cell icons */
+    .cells{display:flex;gap:8px;align-items:center}
+    .cell{width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-weight:700}
+    .virus{filter:drop-shadow(0 6px 18px rgba(251,113,133,0.08))}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo" aria-hidden="true">
+        <!-- simple immune SVG -->
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g>
+            <circle cx="32" cy="32" r="20" fill="white" opacity="0.08"></circle>
+            <path d="M32 18c3 0 5 1.5 6 3.5S39 26 32 33s-9-2.5-10-7.5S29 18 32 18z" fill="white" opacity="0.12"/>
+            <circle cx="24" cy="28" r="2.6" fill="white"></circle>
+            <circle cx="40" cy="28" r="2.6" fill="white"></circle>
+            <path d="M32 38c2.2 0 4-1.78 4-4s-1.8-4-4-4-4 1.78-4 4 1.8 4 4 4z" fill="white" opacity="0.18"></path>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <h1>Quiz: Defesa do Corpo</h1>
+        <p>Teste seus conhecimentos sobre o sistema imunológico — responda e aprenda com explicações.</p>
+      </div>
+    </header>
+
+    <div class="card quiz" role="application" aria-labelledby="quizTitle">
+      <main class="main" id="main">
+        <div class="meta" aria-hidden="true">
+          <div class="badge" id="qcount">Pergunta 1 / 12</div>
+          <div class="progress" aria-hidden="true"><i id="bar"></i></div>
+        </div>
+
+        <h2 class="qtitle" id="quizTitle">O que é responsável por memorizar invasores?</h2>
+        <div class="question-text" id="questionText">Selecione a opção correta:</div>
+
+        <div class="choices" id="choices" role="list"></div>
+
+        <div class="explain" id="explain" hidden></div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:14px">
+          <button class="ghost" id="prevBtn" aria-label="Pergunta anterior" disabled>Anterior</button>
+          <div style="display:flex;gap:8px">
+            <button class="ghost" id="skipBtn">Pular</button>
+            <button id="nextBtn">Próxima</button>
+          </div>
+        </div>
+      </main>
+
+      <aside class="side" aria-hidden="false">
+        <div class="stat">
+          <div>
+            <small>Pontuação</small>
+            <div style="font-weight:800;font-size:20px" id="score">0</div>
+          </div>
+          <div style="text-align:right">
+            <small>Acertos</small>
+            <div style="font-weight:800;font-size:20px;color:var(--accent-2)" id="correct">0</div>
+          </div>
+        </div>
+
+        <div class="stat">
+          <div>
+            <small>Tema</small>
+            <div style="font-weight:700">Sistema Imunológico</div>
+          </div>
+          <div>
+            <small>Nível</small>
+            <div class="badge">Ensino Médio</div>
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end">
+          <div class="cells" aria-hidden="true">
+            <div class="cell">T</div>
+            <div class="cell">B</div>
+            <div class="cell">M</div>
+            <svg class="virus" width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="#fb7185" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="12" cy="12" r="4" stroke="#fb7185" stroke-width="1.6"/>
+            </svg>
+          </div>
+
+          <div style="margin-top:12px" class="btns">
+            <button id="restart">Reiniciar</button>
+            <button class="ghost" id="study">Modo Estudo</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      <div id="feedback" style="color:var(--muted)">Dica: as explicações ajudam a estudar após cada resposta.</div>
+      <div style="font-size:12px;color:var(--muted)">Feito por Mika • Sistema Imunológico</div>
+    </footer>
+
+  </div>
+
+  <script>
+    // --- Banco de perguntas (você pode editar/expandir) ---
+    const QUESTIONS = [
+      {
+        q: "Qual célula é a principal 'memória' do sistema adaptativo, responsável por reconhecer invasores já encontrados?",
+        choices: ["Linfócito T auxiliar","Linfócito B (célula de memória)","Macrófago","Plaqueta"],
+        answer: 1,
+        explain: "Os linfócitos B podem se diferenciar em células de memória, que permanecem por anos e respondem rápido ao mesmo antígeno."
+      },
+      {
+        q: "Qual célula faz a fagocitose, 'engolindo' micro-organismos?",
+        choices: ["Macrófago","Linfócito T citotóxico","Eritrócito","Fibroblasto"],
+        answer: 0,
+        explain: "Macrófagos e neutrófilos realizam fagocitose — eles 'engolem' e digerem microrganismos."
+      },
+      {
+        q: "Qual molécula específica identifica antígenos e marca invasores para destruição?",
+        choices: ["Anticorpo (imunoglobulina)","Hemoglobina","Colágeno","Insulina"],
+        answer: 0,
+        explain: "Anticorpos se ligam a antígenos específicos e neutralizam ou marcam os invasores para outras células."
+      },
+      {
+        q: "A imunidade inata é _______ e a adaptativa é _______.",
+        choices: ["específica / inespecífica","inespecífica / específica","lenta / imediata","sempre adquirida / sempre natural"],
+        answer: 1,
+        explain: "Imunidade inata age rápido e sem especificidade; a adaptativa é específica (anticorpos, células T) e tem memória."
+      },
+      {
+        q: "Qual órgão é essencial para a maturação dos linfócitos T?",
+        choices: ["Baço","Timo","Fígado","Medula óssea"],
+        answer: 1,
+        explain: "O timo é onde os linfócitos T amadurecem e aprendem a distinguir próprio de não-próprio."
+      },
+      {
+        q: "Vacinas funcionam porque:",
+        choices: ["Matam vírus imediatamente","Geram células de memória sem causar a doença (em geral)","Aumentam a temperatura do corpo","Trocam o sangue"],
+        answer: 1,
+        explain: "Vacinas expõem o sistema imune a antígenos (inativados/fragmentos) para gerar memória e proteção."
+      },
+      {
+        q: "Qual proteína de superfície das células marca tecido como 'próprio' evitando ataque autoimune?",
+        choices: ["Antígeno MHC (complexo principal de histocompatibilidade)","Insulina","Miosina","Queratina"],
+        answer: 0,
+        explain: "MHC é essencial para apresentação de antígenos e reconhecimento próprio/não-próprio."
+      },
+      {
+        q: "Qual célula mata células infectadas por vírus diretamente?",
+        choices: ["Linfócito T citotóxico (CTL)","Bactéria benigna","Neurônio","Célula epitelial"],
+        answer: 0,
+        explain: "Os linfócitos T citotóxicos reconhecem células que apresentam peptídeos virais e induzem apoptose."
+      },
+      {
+        q: "Anticorpos são produzidos por:",
+        choices: ["Células dendríticas","Linfócitos B/plasma","Plaquetas","Hemácias"],
+        answer: 1,
+        explain: "Linfócitos B quando ativados se diferenciam em células plasmáticas que secretam anticorpos."
+      },
+      {
+        q: "Qual célula tem papel fundamental na ativação do linfócito T, apresentando antígenos?",
+        choices: ["Célula dendrítica","Osteócito","Melanócito","Adipócito"],
+        answer: 0,
+        explain: "Células dendríticas capturam antígenos, migram para linfonodos e ativam linfócitos T."
+      },
+      {
+        q: "O que é resposta inflamatória?",
+        choices: ["Processo de defesa que envolve calor, rubor e aumento de fluxo sanguíneo","Perda de memória","Produção de anticorpos só no fígado","Contração muscular voluntária"],
+        answer: 0,
+        explain: "Inflamação é um mecanismo de defesa com sinais clássicos: calor, rubor (vermelhidão), dor e edema."
+      },
+      {
+        q: "Qual componente do sangue transporta oxigênio e não participa diretamente da defesa imune?",
+        choices: ["Hemácia (glóbulo vermelho)","Neutrófilo","Monócito","Linfócito"],
+        answer: 0,
+        explain: "Hemácias transportam oxigênio; glóbulos brancos (leucócitos) fazem a defesa."
+      }
+    ];
+
+    // --- Estado ---
+    let idx = 0;
+    let score = 0;
+    let correctCount = 0;
+    let answered = Array(QUESTIONS.length).fill(null); // store chosen index or null
+    let studyMode = false;
+
+    // --- UI refs ---
+    const qcount = document.getElementById('qcount');
+    const bar = document.getElementById('bar');
+    const quizTitle = document.getElementById('quizTitle');
+    const questionText = document.getElementById('questionText');
+    const choicesEl = document.getElementById('choices');
+    const explainEl = document.getElementById('explain');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const skipBtn = document.getElementById('skipBtn');
+    const scoreEl = document.getElementById('score');
+    const correctEl = document.getElementById('correct');
+    const restartBtn = document.getElementById('restart');
+    const studyBtn = document.getElementById('study');
+
+    // --- Helpers ---
+    function render(){
+      const item = QUESTIONS[idx];
+      qcount.textContent = `Pergunta ${idx+1} / ${QUESTIONS.length}`;
+      const pct = ((idx) / (QUESTIONS.length-1))*100;
+      bar.style.width = `${( (idx+1)/QUESTIONS.length)*100}%`;
+      quizTitle.textContent = item.q;
+      questionText.textContent = item.q; // keep title + text equal for clarity
+      choicesEl.innerHTML = '';
+      explainEl.hidden = true;
+      explainEl.textContent = '';
+
+      item.choices.forEach((c, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.type = 'button';
+        btn.setAttribute('role','listitem');
+        if(answered[idx] !== null) btn.classList.add('disabled');
+
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.textContent = String.fromCharCode(65 + i); // A B C D
+
+        const span = document.createElement('div');
+        span.textContent = c;
+
+        btn.appendChild(dot);
+        btn.appendChild(span);
+
+        btn.addEventListener('click', () => select(i, btn));
+
+        choicesEl.appendChild(btn);
+      });
+
+      prevBtn.disabled = idx === 0;
+      nextBtn.disabled = false;
+      nextBtn.textContent = (idx === QUESTIONS.length -1) ? 'Finalizar' : 'Próxima';
+      // show explanation if already answered
+      if(answered[idx] !== null){
+        revealAnswer(answered[idx]);
+      }
+    }
+
+    function select(choiceIndex, btnEl){
+      if(answered[idx] !== null) return;
+      answered[idx] = choiceIndex;
+      const correct = QUESTIONS[idx].answer;
+
+      // mark all choices
+      const btns = choicesEl.querySelectorAll('.choice');
+      btns.forEach((b, i) => {
+        b.classList.add('disabled');
+        if(i === correct) b.classList.add('correct');
+        if(i === choiceIndex && i !== correct) b.classList.add('wrong');
+      });
+
+      // score update
+      if(choiceIndex === correct){
+        score += 10; correctCount += 1;
+        explainEl.textContent = "Certo! " + QUESTIONS[idx].explain;
+      } else {
+        score -= 2;
+        explainEl.textContent = "Errado. " + QUESTIONS[idx].explain;
+      }
+      score = Math.max(0, score);
+      scoreEl.textContent = score;
+      correctEl.textContent = correctCount;
+      explainEl.hidden = false;
+
+      // if study mode, allow next immediately; otherwise auto-enable next after small delay
+    }
+
+    function revealAnswer(chosenIndex){
+      // show explanation + color choices
+      const correct = QUESTIONS[idx].answer;
+      const btns = choicesEl.querySelectorAll('.choice');
+      btns.forEach((b, i) => {
+        b.classList.add('disabled');
+        if(i === correct) b.classList.add('correct');
+        if(chosenIndex === i && i !== correct) b.classList.add('wrong');
+      });
+      document.getElementById('explain').textContent = (chosenIndex === correct ? "Certo! " : "Errado. ") + QUESTIONS[idx].explain;
+      explainEl.hidden = false;
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if(idx > 0) { idx--; render(); }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if(idx < QUESTIONS.length -1){
+        idx++;
+        render();
+      } else {
+        showResults();
+      }
+    });
+
+    skipBtn.addEventListener('click', () => {
+      // mark as skipped (null stays), go next
+      if(idx < QUESTIONS.length -1){
+        idx++; render();
+      } else {
+        showResults();
+      }
+    });
+
+    restartBtn.addEventListener('click', () => {
+      if(confirm('Reiniciar o quiz? Todas as respostas serão apagadas.')){
+        idx = 0; score = 0; correctCount = 0; answered = Array(QUESTIONS.length).fill(null);
+        scoreEl.textContent = score; correctEl.textContent = correctCount;
+        render();
+      }
+    });
+
+    studyBtn.addEventListener('click', () => {
+      studyMode = !studyMode;
+      studyBtn.textContent = studyMode ? 'Modo Jogo' : 'Modo Estudo';
+      studyBtn.classList.toggle('ghost');
+      // In study mode, show correct answer immediately without scoring penalties
+      if(studyMode){
+        // reveal current correct
+        if(answered[idx] === null){
+          // show correct highlight but do not change score
+          const btns = choicesEl.querySelectorAll('.choice');
+          const correct = QUESTIONS[idx].answer;
+          btns.forEach((b,i)=>{
+            b.classList.add('disabled');
+            if(i === correct) b.classList.add('correct');
+          });
+          explainEl.textContent = QUESTIONS[idx].explain;
+          explainEl.hidden = false;
+        }
+      } else {
+        // exit study: re-render question (keeps answered state)
+        render();
+      }
+    });
+
+    function showResults(){
+      // build result summary modal-like in the main area
+      const main = document.getElementById('main');
+      main.innerHTML = '';
+      const div = document.createElement('div');
+      div.style.padding = '18px';
+      div.innerHTML = `
+        <h2 style="margin-top:0">Resultado</h2>
+        <p style="color:var(--muted)">Você terminou o quiz.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px">
+          <div style="background:var(--glass);padding:12px;border-radius:10px">
+            <small>Pontuação</small><div style="font-size:20px;font-weight:800">${score}</div>
+          </div>
+          <div style="background:var(--glass);padding:12px;border-radius:10px">
+            <small>Acertos</small><div style="font-size:20px;font-weight:800;color:var(--accent-2)">${correctCount} / ${QUESTIONS.length}</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;color:var(--muted)">
+          <p>Resumo por pergunta:</p>
+        </div>
+      `;
+      const list = document.createElement('ol');
+      list.style.marginTop = '8px';
+      list.style.color = 'var(--muted)';
+      QUESTIONS.forEach((it, i) => {
+        const li = document.createElement('li');
+        const chosen = answered[i];
+        const ok = chosen === it.answer;
+        li.innerHTML = `<strong style="color:${ok ? 'var(--accent-2)' : 'var(--danger)'}">${ok ? '✓' : '✕'}</strong> ${it.q} <div style="font-size:13px;color:var(--muted);margin-top:4px">Sua resposta: ${chosen===null? '<em>não respondeu</em>' : it.choices[chosen]} — Correta: ${it.choices[it.answer]}<div style="margin-top:6px;color:var(--muted);font-size:13px">${it.explain}</div></div>`;
+        li.style.marginBottom = '10px';
+        list.appendChild(li);
+      });
+      div.appendChild(list);
+
+      const btnArea = document.createElement('div');
+      btnArea.style.marginTop = '12px';
+      btnArea.style.display = 'flex';
+      btnArea.style.gap = '8px';
+      const restart = document.createElement('button');
+      restart.textContent = 'Refazer';
+      restart.addEventListener('click', ()=> location.reload());
+      const review = document.createElement('button');
+      review.className = 'ghost';
+      review.textContent = 'Baixar resumo (TXT)';
+      review.addEventListener('click', ()=> downloadSummary());
+      btnArea.appendChild(restart);
+      btnArea.appendChild(review);
+      div.appendChild(btnArea);
+
+      main.appendChild(div);
+      // update score side
+      scoreEl.textContent = score;
+      correctEl.textContent = correctCount;
+    }
+
+    function downloadSummary(){
+      let txt = 'Resumo do Quiz - Defesa do Corpo\\n\\n';
+      txt += `Pontuação: ${score}\\nAcertos: ${correctCount} / ${QUESTIONS.length}\\n\\n`;
+      QUESTIONS.forEach((it,i)=>{
+        const chosen = answered[i];
+        const ok = chosen === it.answer;
+        txt += `${i+1}) ${it.q}\\nSua resposta: ${chosen===null? 'não respondeu' : it.choices[chosen]}\\nCorreta: ${it.choices[it.answer]}\\nExplicação: ${it.explain}\\nResultado: ${ok ? 'CORRETO' : 'ERRADO'}\\n\\n`;
+      });
+      const blob = new Blob([txt],{type:'text/plain'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'resumo_quiz_defesa_do_corpo.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // initial render
+    render();
+
+    // Accessibility: keyboard navigation (numbers 1-4 to choose)
+    window.addEventListener('keydown', (e) => {
+      if(e.key >= '1' && e.key <= '4'){
+        const k = parseInt(e.key) - 1;
+        const btns = choicesEl.querySelectorAll('.choice');
+        if(btns[k]) btns[k].click();
+      } else if(e.key === 'ArrowRight'){
+        nextBtn.click();
+      } else if(e.key === 'ArrowLeft'){
+        prevBtn.click();
+      }
+    });
+
+  </script>
+</body>
+</html>
